@@ -7,7 +7,7 @@ namespace Items
         public override void DestroyActions()
         {
         }
-
+        
         public override void ClickAction()
         {
             GameManager.Instance.OnVerticalRocketClicked(x, y);

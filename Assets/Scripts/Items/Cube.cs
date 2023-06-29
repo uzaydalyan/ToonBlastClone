@@ -16,7 +16,9 @@ namespace Items
         
         public override void DestroyActions()
         {
-            ParticleCreator.Instance.CubeDestroyAction(transform.position, type);
+            DecreaseGoal();
+            StartCoroutine(AnimationManager.Instance.CubeSpreadParticles(transform.position, type));
         }
+        
     }
 }

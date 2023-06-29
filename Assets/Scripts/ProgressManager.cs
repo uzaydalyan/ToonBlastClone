@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using Items;
+using UnityEditor.Rendering;
 using UnityEngine;
 using UnityEngine.UI;
 
@@ -88,6 +89,7 @@ namespace DefaultNamespace
                 {
                     goal.goal = goal.goal == 0 ? 0 : goal.goal-1;
                     _goalTexts[i].text = goal.goal.ToString();
+                    AnimationManager.Instance.GoalAnimations(item.transform.position, item.type, _goalTexts[i].transform.position);
                 }
                 i++;
             }

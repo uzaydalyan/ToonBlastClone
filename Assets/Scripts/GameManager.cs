@@ -344,7 +344,6 @@ public class GameManager : MonoBehaviour
 
             visitedItems.Add(new ElementLocation(x, y));
             matchedItems.Add(new ElementLocation(x, y));
-            _grid[x, y].GetComponent<Cube>().DecreaseGoal();
             missingElementCounts[y]++;
             
             GetMatches(clickedColor, x - 1, y);
