@@ -1562,70 +1562,70 @@ MonoBehaviour:
   _width: 8
   _height: 8
   _gridInput:
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - 
-  - rocket_horizontal
-  - 
-  - 
+  - r
+  - r
+  - r
+  - r
+  - r
+  - r
+  - r
+  - r
+  - r
+  - r
+  - r
+  - r
+  - r
+  - r
+  - r
+  - r
+  - r
+  - r
+  - r
+  - r
+  - r
   - duck
   - duck
-  - balloon
-  - balloon
-  - balloon
-  - balloon
-  - balloon
-  - balloon
-  - balloon
-  - balloon
-  - balloon
-  - balloon
-  - balloon
-  - balloon
-  - balloon
-  - balloon
-  - balloon
-  - balloon
-  - balloon
-  - balloon
-  - balloon
-  - balloon
-  - balloon
-  - balloon
-  - balloon
-  - balloon
-  - balloon
-  - balloon
-  - balloon
-  - balloon
-  - balloon
-  - balloon
-  - balloon
-  - balloon
-  - balloon
-  - balloon
-  - balloon
-  - balloon
-  - balloon
-  - balloon
-  - balloon
-  - balloon
-  - balloon
+  - duck
+  - duck
+  - duck
+  - duck
+  - duck
+  - duck
+  - duck
+  - duck
+  - duck
+  - duck
+  - duck
+  - duck
+  - duck
+  - duck
+  - duck
+  - duck
+  - duck
+  - duck
+  - duck
+  - duck
+  - duck
+  - duck
+  - duck
+  - duck
+  - duck
+  - duck
+  - duck
+  - duck
+  - duck
+  - duck
+  - duck
+  - duck
+  - duck
+  - duck
+  - duck
+  - duck
+  - duck
+  - duck
+  - duck
+  - duck
+  - duck
   _gameOverPopup: {fileID: 321726671}
   _gameOverText: {fileID: 1014671221}
   _restartButton: {fileID: 232983702}

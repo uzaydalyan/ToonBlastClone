@@ -22,16 +22,16 @@ public class GameManager : MonoBehaviour
     [SerializeField] private int _width;
     [SerializeField] private int _height;
     [SerializeField] private string[] _gridInput;
-    private bool _endMoveActionsHasRun = false;
+    private bool _endMoveActionsisRunning = false;
     
     // A variable for state management of grid
     private GridState _gridState = GridState.Fall;
-    
+     
     // A factory for creating items
     private ItemFactory _itemFactory;
     
     // Variables to process items on clicks
-    private int _currentExplosionCount;
+    private int _currentExplodingPowerCount;
     private Vector2[,] _itemLocations;
     private List<ElementLocation> matchedItems = new();
     private List<ElementLocation> visitedItems = new();
@@ -47,8 +47,7 @@ public class GameManager : MonoBehaviour
     public int Width => _width;
     public GameObject[,] Grid => _grid;
     public Vector2[,] ItemLocations => _itemLocations;
-    public GridState GridState => _gridState;
-    
+
     private void Awake()
     {
         Instance = this;
@@ -68,33 +67,31 @@ public class GameManager : MonoBehaviour
         {
             if (FallCompleted())
             {
-                _gridState = GridState.EndOfMove;
+                if (CheckForPossibleDestroys())
+                {
+                    if (_endMoveActionsisRunning != true)
+                    {
+                        _endMoveActionsisRunning = true;
+                        StartCoroutine(CallDelayedEndOfMove());
+                    }
+                }
+                else
+                {
+                    if (_endMoveActionsisRunning != true)
+                    {
+                        _gridState = GridState.Free;
+                        GameStatus status = ProgressManager.Instance.GetGameStatus();
+                        if (status != GameStatus.Present)
+                        {
+                            _gridState = GridState.Finished;
+                            GameOverAction(status);
+                        }
+                    }
+                }
             }
         } else if (_gridState == GridState.EndOfMove)
         {
             EndOfMoveActions();
-
-        } else if (_gridState == GridState.FallOfEndOfMove)
-        {
-            if (CheckForPossibleDestroys())
-            {
-                if (_endMoveActionsHasRun != true)
-                {
-                    _endMoveActionsHasRun = true;
-                    StartCoroutine(CallDelayedEndOfMove());
-                }
-                
-            }
-            else
-            {
-                _gridState = GridState.Free;
-                GameStatus status = ProgressManager.Instance.GetGameStatus();
-                if (status != GameStatus.Present)
-                {
-                    _gridState = GridState.Finished;
-                    GameOverAction(status);
-                }
-            }
 
         } else if (_gridState == GridState.Animation)
         {
@@ -216,7 +213,7 @@ public class GameManager : MonoBehaviour
             return;
         }
         
-        _endMoveActionsHasRun = true;
+        _endMoveActionsisRunning = true;
         ResetArrays();
         _gridState = GridState.Animation;
 
@@ -235,8 +232,8 @@ public class GameManager : MonoBehaviour
         }
         
         RelocateRemainingItems();
-        _gridState = GridState.FallOfEndOfMove;
-        _endMoveActionsHasRun = false;
+        _gridState = GridState.Fall;
+        _endMoveActionsisRunning = false;
         FillSpaces(); 
         ResetArrays();
     }
@@ -376,7 +373,7 @@ public class GameManager : MonoBehaviour
             yield break;
         }
 
-        _currentExplosionCount = 1;
+        _currentExplodingPowerCount = 1;
         ResetArrays();
         ProgressManager.Instance.DecreaseMoveCount();
         _gridState = GridState.Animation;
@@ -404,7 +401,7 @@ public class GameManager : MonoBehaviour
             j++;
         }
         
-        if (_currentExplosionCount == 1)
+        if (_currentExplodingPowerCount == 1)
         {
             JoinDestroyedObstacles();
             RelocateRemainingItems();
@@ -412,7 +409,7 @@ public class GameManager : MonoBehaviour
             FillSpaces();
         }
 
-        _currentExplosionCount--;
+        _currentExplodingPowerCount--;
     }
 
     private void DestroyWithRocket(int x, int i)
@@ -432,6 +429,7 @@ public class GameManager : MonoBehaviour
                 script.OnExplode();
             } else
             {
+                _grid[x, i].GetComponent<Cube>().DestroyActions();
                 Destroy(_grid[x, i]);
                 _grid[x, i] = null;
                 matchedItems.Add(new ElementLocation(x, i));
@@ -467,7 +465,7 @@ public class GameManager : MonoBehaviour
 
     public IEnumerator ExplodeHorizontalRocket(int x, int y)
     {
-        _currentExplosionCount++;
+        _currentExplodingPowerCount++;
 
         Destroy(_grid[x, y]);
         _grid[x, y] = null;
@@ -493,14 +491,14 @@ public class GameManager : MonoBehaviour
             j++;
         }
         
-        if (_currentExplosionCount == 1)
+        if (_currentExplodingPowerCount == 1)
         {
             JoinDestroyedObstacles();
             RelocateRemainingItems();
             _gridState = GridState.Fall;
             FillSpaces();
         }
-        _currentExplosionCount--;
+        _currentExplodingPowerCount--;
     }
 
     public void OnVerticalRocketClicked(int x, int y)
@@ -515,7 +513,7 @@ public class GameManager : MonoBehaviour
             yield break;
         }
 
-        _currentExplosionCount = 1;
+        _currentExplodingPowerCount = 1;
         ResetArrays();
         ProgressManager.Instance.DecreaseMoveCount();
         _gridState = GridState.Animation;
@@ -543,7 +541,7 @@ public class GameManager : MonoBehaviour
             j++;
         }
         
-        if (_currentExplosionCount == 1)
+        if (_currentExplodingPowerCount == 1)
         {
             JoinDestroyedObstacles();
             RelocateRemainingItems();
@@ -551,7 +549,7 @@ public class GameManager : MonoBehaviour
             FillSpaces();
         }
 
-        _currentExplosionCount--;
+        _currentExplodingPowerCount--;
     }
     
     public void OnRocketVerticalExplode(int x, int y)
@@ -561,7 +559,7 @@ public class GameManager : MonoBehaviour
 
     public IEnumerator ExplodeVerticalRocket(int x, int y)
     {
-        _currentExplosionCount++;
+        _currentExplodingPowerCount++;
 
         Destroy(_grid[x, y]);
         _grid[x, y] = null;
@@ -587,14 +585,14 @@ public class GameManager : MonoBehaviour
             j++;
         }
         
-        if (_currentExplosionCount == 1)
+        if (_currentExplodingPowerCount == 1)
         {
             JoinDestroyedObstacles();
             RelocateRemainingItems();
             _gridState = GridState.Fall;
             FillSpaces();
         }
-        _currentExplosionCount--;
+        _currentExplodingPowerCount--;
     }
 
     public void FreezeGrid()

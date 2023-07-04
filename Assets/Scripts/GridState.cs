@@ -6,7 +6,6 @@ namespace DefaultNamespace
         Animation,
         Fall,
         EndOfMove,
-        FallOfEndOfMove,
         Finished
     }
 }
