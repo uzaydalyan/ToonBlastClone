@@ -67,31 +67,36 @@ public class GameManager : MonoBehaviour
         {
             if (FallCompleted())
             {
-                if (CheckForPossibleDestroys())
-                {
-                    if (_endMoveActionsisRunning != true)
-                    {
-                        _endMoveActionsisRunning = true;
-                        StartCoroutine(CallDelayedEndOfMove());
-                    }
-                }
-                else
-                {
-                    if (_endMoveActionsisRunning != true)
-                    {
-                        _gridState = GridState.Free;
-                        GameStatus status = ProgressManager.Instance.GetGameStatus();
-                        if (status != GameStatus.Present)
-                        {
-                            _gridState = GridState.Finished;
-                            GameOverAction(status);
-                        }
-                    }
-                }
+                _gridState = GridState.EndOfMove;
             }
         } else if (_gridState == GridState.EndOfMove)
         {
             EndOfMoveActions();
+
+        } else if (_gridState == GridState.FallOfEndOfMove)
+        {
+            if (CheckForPossibleDestroys())
+            {
+                if (_endMoveActionsisRunning!= true)
+                {
+                    _endMoveActionsisRunning = true;
+                    StartCoroutine(CallDelayedEndOfMove());
+                }
+                
+            }
+            else
+            {
+                if (FallCompleted())
+                {
+                    _gridState = GridState.Free;
+                    GameStatus status = ProgressManager.Instance.GetGameStatus();
+                    if (status != GameStatus.Present)
+                    {
+                        _gridState = GridState.Finished;
+                        GameOverAction(status);
+                    }
+                }
+            }
 
         } else if (_gridState == GridState.Animation)
         {
@@ -130,20 +135,22 @@ public class GameManager : MonoBehaviour
     {
         for (int i = 0; i < Width; i++)
         {
-            if (missingElementCounts[i] > 0)
-            {
-                for (int j = 0; j < Height; j++)
+            for (int j = 0; j < Height; j++)
                 {
-                    double y1 = Math.Round(_grid[j, i].transform.position.y, 1);
-                    double y2 = Math.Round(_itemLocations[j, i].y, 1);
+                    
+                    double y1 = _grid[j, i].transform.position.y;
+                    double y2 = i != 0 ? _grid[j, i - 1].transform.position.y : y1;
+                    double y3 = i != _width - 1 ? _grid[j, i + 1].transform.position.y : y1;
 
-                    if (Math.Abs(y1 - y2) > 0.2)
+                    double distance1 = Math.Abs(y1 - y2);
+                    double distance2 = Math.Abs(y1 - y3);
+
+                    if (distance1 > 0.5 || distance2 > 0.5)
                     {
                         return false;
                     }
                 }
             }
-        }
 
         return true;
     }
@@ -232,7 +239,7 @@ public class GameManager : MonoBehaviour
         }
         
         RelocateRemainingItems();
-        _gridState = GridState.Fall;
+        _gridState = GridState.FallOfEndOfMove;
         _endMoveActionsisRunning = false;
         FillSpaces(); 
         ResetArrays();
