@@ -67,26 +67,16 @@ public class GameManager : MonoBehaviour
         {
             if (FallCompleted())
             {
-                _gridState = GridState.EndOfMove;
-            }
-        } else if (_gridState == GridState.EndOfMove)
-        {
-            EndOfMoveActions();
-
-        } else if (_gridState == GridState.FallOfEndOfMove)
-        {
-            if (CheckForPossibleDestroys())
-            {
-                if (_endMoveActionsisRunning!= true)
+                if (CheckForPossibleDestroys())
                 {
-                    _endMoveActionsisRunning = true;
-                    StartCoroutine(CallDelayedEndOfMove());
-                }
+                    if (_endMoveActionsisRunning!= true)
+                    {
+                        _endMoveActionsisRunning = true;
+                        StartCoroutine(CallDelayedEndOfMove());
+                    }
                 
-            }
-            else
-            {
-                if (FallCompleted())
+                }
+                else
                 {
                     _gridState = GridState.Free;
                     GameStatus status = ProgressManager.Instance.GetGameStatus();
@@ -97,8 +87,11 @@ public class GameManager : MonoBehaviour
                     }
                 }
             }
+        } else if (_gridState == GridState.EndOfMove)
+        {
+            EndOfMoveActions();
 
-        } else if (_gridState == GridState.Animation)
+        }else if (_gridState == GridState.Animation)
         {
             FreezeGrid();
         }
@@ -106,7 +99,7 @@ public class GameManager : MonoBehaviour
 
     private IEnumerator CallDelayedEndOfMove()
     {
-        yield return new WaitForSeconds(0.5f);
+        yield return new WaitForSeconds(0.2f);
         _gridState = GridState.EndOfMove;
     }
 
@@ -139,13 +132,10 @@ public class GameManager : MonoBehaviour
                 {
                     
                     double y1 = _grid[j, i].transform.position.y;
-                    double y2 = i != 0 ? _grid[j, i - 1].transform.position.y : y1;
-                    double y3 = i != _width - 1 ? _grid[j, i + 1].transform.position.y : y1;
+                    double y2 = _itemLocations[j, i].y;
 
-                    double distance1 = Math.Abs(y1 - y2);
-                    double distance2 = Math.Abs(y1 - y3);
-
-                    if (distance1 > 0.5 || distance2 > 0.5)
+                    double distance = Math.Abs(y1 - y2);
+                    if (distance > 0.4)
                     {
                         return false;
                     }
@@ -239,7 +229,7 @@ public class GameManager : MonoBehaviour
         }
         
         RelocateRemainingItems();
-        _gridState = GridState.FallOfEndOfMove;
+        _gridState = GridState.Fall;
         _endMoveActionsisRunning = false;
         FillSpaces(); 
         ResetArrays();
