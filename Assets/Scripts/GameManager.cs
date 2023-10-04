@@ -47,7 +47,7 @@ public class GameManager : MonoBehaviour
     public int Width => _width;
     public GameObject[,] Grid => _grid;
     public Vector2[,] ItemLocations => _itemLocations;
-
+    
     private void Awake()
     {
         Instance = this;
